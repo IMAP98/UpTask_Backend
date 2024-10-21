@@ -1,31 +1,42 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, PopulatedDoc, Schema, Types } from "mongoose";
+import { InterfaceTask } from "./Task";
 
-// NOTE: TypeScript
-export type ProjectType = Document & {
+// SECTION: TypeScript
+export interface InterfaceProject extends Document {
     projectName: string;
     clientName: string;
     description: string;
+    tasks: PopulatedDoc<InterfaceTask & Document>[]
 }
 
-// NOTE: Mongoose
-const ProjectSchema: Schema = new Schema({
-    projectName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    clientName: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    description: {
-        type: String,
-        required: true,
-        trim: true,
+// SECTION: Mongoose
+const ProjectSchema: Schema = new Schema(
+    {
+        projectName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        clientName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        description: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        tasks: [{ 
+            type: Types.ObjectId,
+            ref: 'Task',
+        }],
+    }, 
+    {
+        timestamps: true
     }
-});
+);
 
-const Project = mongoose.model<ProjectType>('Project', ProjectSchema);
+const Project = mongoose.model<InterfaceProject>('Project', ProjectSchema);
 
 export default Project;
