@@ -7,7 +7,7 @@ const router = Router();
 
 router.post('/create-account',
     body('name').isString().withMessage('Invalid name'),
-    body('email').isString().withMessage('Invalid email'),
+    body('email').isEmail().isString().withMessage('Invalid email'),
     body('password').isString().isLength({min: 8}).withMessage('Invalid password.'), 
     body('password-confirmation').custom((value, { req }) => {
         if (value !== req.body.password) {
@@ -24,4 +24,12 @@ router.post('/confirm-account',
     handleInputErrors,
     AuthController.confirmAccount
 );
+
+router.post('/login',
+    body('email').isEmail().withMessage('Invalid email'),
+    body('password').isString().notEmpty().withMessage('Invalid password.'), 
+    handleInputErrors,
+    AuthController.login
+);
+
 export default router;
