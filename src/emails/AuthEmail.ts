@@ -22,4 +22,19 @@ export class AuthEmail {
         });
         
     }
+
+    static sendPasswordResetToken = async (user: IEmail) => {
+        const info = await transporter.sendMail({
+            from: 'UpTask <noreply@uptask.com>',
+            to: user.email,
+            subject: "UpTask - Reset your password",
+            html: `<p>Hello <b>${user.name}</b>, you have requested a password reset.</p>
+                <a href="${process.env.FRONTEND_URL}/auth/new-password">Click here to reset your password</a>
+                <p>And enter the following token in the confirmation field: <b>${user.token}</b></p>
+                <p>This link will expire in 10 minutes.</p>
+                <p>If you did not request this, please ignore this email.</p>
+            `
+        });
+        
+    }
 }
