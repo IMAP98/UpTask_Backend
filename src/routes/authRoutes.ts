@@ -9,7 +9,7 @@ router.post('/create-account',
     body('name').isString().withMessage('Invalid name'),
     body('email').isEmail().isString().withMessage('Invalid email'),
     body('password').isString().isLength({min: 8}).withMessage('Invalid password.'), 
-    body('password-confirmation').custom((value, { req }) => {
+    body('password_confirmation').custom((value, { req }) => {
         if (value !== req.body.password) {
             throw new Error('Passwords do not match');
         }
