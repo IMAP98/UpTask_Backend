@@ -15,7 +15,7 @@ export class AuthController {
 
             if (userExists) {
                 const error = new Error("User already exists");
-                res.status(409).json({ error: error.message });
+                res.status(404).json({ error: error.message });
                 return;
             }
 
@@ -109,6 +109,46 @@ export class AuthController {
             
             res.send("Authenticated successfully");
 
+        } catch (error) {
+            res.status(500).json({error: "Internal server error"});
+        }
+    }
+
+    static requestConfirmationCode = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body;
+
+            // NOTE: Check if user already exists
+            const user = await User.findOne({ email });
+
+            if (!user) {
+                const error = new Error("The user does not exist");
+                res.status(404).json({ error: error.message });
+                return;
+            }
+
+            // NOTE: Check if user is confirmed already
+            if (user.confirmed) {
+                const error = new Error("The user is already confirmed");
+                res.status(403).json({ error: error.message });
+                return;
+            }
+
+            // NOTE: Create token
+            const token = new Token();
+            token.token = generateToken();
+            token.user = user.id;
+
+            // NOTE: Send email
+            AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token,
+            });
+
+            await Promise.allSettled([user.save(), token.save()]);
+
+            res.send("New confirmation code sent");
         } catch (error) {
             res.status(500).json({error: "Internal server error"});
         }
