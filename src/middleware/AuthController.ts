@@ -1,9 +1,9 @@
-import type { Request, Response} from "express";
+import type { Request, Response } from "express";
+import { AuthEmail } from "../emails/AuthEmail";
+import Token from "../models/Token";
 import User from "../models/User";
 import { checkPassword, hashPasword } from "../utils/auth";
-import Token from "../models/Token";
 import { generateToken } from "../utils/token";
-import { AuthEmail } from "../emails/AuthEmail";
 
 export class AuthController {
     static createAccount = async (req: Request, res: Response) => {
@@ -12,6 +12,7 @@ export class AuthController {
 
             // NOTE: Check if user already exists
             const userExists = await User.findOne({ email });
+
             if (userExists) {
                 const error = new Error("User already exists");
                 res.status(409).json({ error: error.message });
