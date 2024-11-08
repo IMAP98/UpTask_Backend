@@ -9,9 +9,10 @@ import { handleInputErrors } from "../middleware/validation";
 
 const router = Router();
 
+router.use(authenticate);
+
 // SECTION: Routes for projects
 router.post('/',
-    authenticate,
 
     body('projectName')
     .notEmpty().withMessage("The project name is required."),

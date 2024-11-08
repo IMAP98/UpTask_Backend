@@ -1,12 +1,14 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 // SECTION: TypeScript
 export interface IUser {
+    id: Types.ObjectId;
     email: string;
     password: string;
     name: string;
     confirmed: boolean;
 }
+
 
 // SECTION: Mongoose
 const userSchema: Schema = new Schema(

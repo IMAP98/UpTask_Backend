@@ -11,7 +11,7 @@ const taskStatus = {
 export type TaskStatus = typeof taskStatus[keyof typeof taskStatus];
 
 // SECTION: TypeScript
-export interface InterfaceTask extends Document {
+export interface ITask extends Document {
     name: string;
     description: string;
     project: Types.ObjectId;
@@ -46,6 +46,6 @@ const TaskSchema: Schema = new Schema(
     }
 );
 
-const Task = mongoose.model<InterfaceTask>('Task', TaskSchema);
+const Task = mongoose.model<ITask>('Task', TaskSchema);
 
 export default Task;
