@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { AuthEmail } from "../emails/AuthEmail";
 import Token from "../models/Token";
 import User from "../models/User";
-import { checkPassword, hashPasword } from "../utils/auth";
+import { checkPassword, hashPasword } from '../utils/auth';
 import { generateJWT } from "../utils/jwt";
 import { generateToken } from "../utils/token";
 
@@ -282,6 +282,21 @@ export class AuthController {
         } catch (error) {
             res.status(500).json({error: "Internal server error"});
         }
+    }
+
+    static async checkPassword(req: Request, res: Response) {
+        const { password } = req.body;
+        const user = await User.findById(req.user.id);
+
+        const isPasswordCorrect = await checkPassword(password, user.password);
+
+        if (!isPasswordCorrect) {
+            const error = new Error("Incorrect password");
+            res.status(401).json({ error: error.message });
+            return;
+        }
+
+        res.send("Valid password");
     }
     
 }
