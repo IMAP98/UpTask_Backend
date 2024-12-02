@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../middleware/validation";
-import { AuthController } from "../middleware/AuthController";
+import { AuthController } from "../controllers/AuthController";
 import { authenticate } from "../middleware/auth";
 
 const router = Router();
@@ -65,5 +65,29 @@ router.post('/update-password/:token',
 );
 
 router.get('/user', authenticate, AuthController.user);
+
+// SECTION: Routes for profile
+
+router.put('/profile', 
+    authenticate,
+    body('name').notEmpty().withMessage('The name is required.'),
+    body('email').isEmail().withMessage('Invalid email'),
+    handleInputErrors,
+    AuthController.updateProfile
+);
+
+router.post('/update-password',
+    authenticate,
+    body('current_password').notEmpty().withMessage('The current password is required.'),
+    body('password').isString().isLength({min: 8}).withMessage('The password must have at least 8 characters'),
+    body('password_confirmation').custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error('Passwords do not match');
+        }
+        return true;
+    }),
+    handleInputErrors,
+    AuthController.updateCurrentUserPassword
+);
 
 export default router;

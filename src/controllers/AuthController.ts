@@ -108,7 +108,7 @@ export class AuthController {
                 return;
             }
 
-            const token = generateJWT({id: user._id});
+            const token = generateJWT({id: user.id});
             
             res.send(token);
 
@@ -238,4 +238,50 @@ export class AuthController {
         res.json(req.user);
         return;
     }
+
+    static updateProfile = async (req: Request, res: Response) => {
+        const { name, email } = req.body;
+
+        const userExists = await User.findOne({ email });
+
+        if (userExists && userExists.id.toString() !== req.user.id.toString()) {
+            const error = new Error("The email is already in use.");
+            res.status(409).json({ error: error.message });
+            return;
+        }
+
+        req.user.name = name;
+        req.user.email = email;
+
+        try {
+            await req.user.save();
+            res.send("Profile updated successfully");
+
+        } catch (error) {
+            res.status(500).json({error: "Internal server error"});
+        }
+    }
+
+    static async updateCurrentUserPassword(req: Request, res: Response) {
+        const { password, current_password } = req.body;
+        const user = await User.findById(req.user.id);
+
+        const isPasswordCorrect = await checkPassword(current_password, user.password);
+
+        if (!isPasswordCorrect) {
+            const error = new Error("Incorrect password");
+            res.status(401).json({ error: error.message });
+            return;
+        }
+
+        try {
+            user.password = await hashPasword(password);
+            await user.save();
+            res.send("Password updated successfully");
+
+        } catch (error) {
+            res.status(500).json({error: "Internal server error"});
+        }
+    }
+    
 }
