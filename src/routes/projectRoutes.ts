@@ -38,8 +38,11 @@ router.get('/:id',
     ProjectController.getProjectById
 );
 
-router.put('/:id', 
-    param('id').isMongoId().withMessage('Invalid ID.'),
+// SECTION: Routes for tasks
+router.param('projectId',projectExists);
+
+router.put('/:projectId', 
+    param('projectId').isMongoId().withMessage('Invalid ID.'),
     
     body('projectName')
     .notEmpty().withMessage("The project name is required."),
@@ -51,13 +54,14 @@ router.put('/:id',
     .notEmpty().withMessage("The project description is required."),
 
     handleInputErrors,
-
+    hasAuthorization,
     ProjectController.updateProject
 );
 
-router.delete('/:id', 
-    param('id').isMongoId().withMessage('Invalid ID.'),
+router.delete('/:projectId', 
+    param('projectId').isMongoId().withMessage('Invalid ID.'),
     handleInputErrors,
+    hasAuthorization,
     ProjectController.deleteProject
 );
 
